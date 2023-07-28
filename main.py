@@ -34,19 +34,34 @@ def get_post_info(url:str, class_name:str, web)-> str:
     soup = BeautifulSoup(web.page_source)
     return soup.find(class_=class_name).text
 
-def new_post_today(date:str) -> bool:
-    post_time = 'July 19, 2023 at 9:03 am'.split('at')[0]
-    raw_date = datetime.datetime.strptime(post_time, '%B %d, %Y ')
-    todays_date = datetime.datetime.strftime(raw_date, '%Y-%m-%d %H:%M:%S').split(' ')[0]
-    date_parsed = datetime.datetime.strptime(todays_date, '%Y-%m-%d')
-    #if blog post from today
-    if date_parsed.date() == datetime.datetime.today().date():
-        return True
-    return False
+# def new_post_today(date:str) -> bool:
+#     post_time = date.split('at')[0]
+#     raw_date = datetime.datetime.strptime(post_time, '%B %d, %Y ')
+#     todays_date = datetime.datetime.strftime(raw_date, '%Y-%m-%d %H:%M:%S').split(' ')[0]
+#     date_parsed = datetime.datetime.strptime(todays_date, '%Y-%m-%d')
+#     #if blog post from today
+#     if date_parsed.date() == datetime.datetime.today().date():
+#         return True
+#     return False
 
 
 def find_winds_reference(content):
     return re.search(r'\winds\b', content.lower())
+
+
+def same_post(last_date:str) -> bool:
+    dir_path = os.path.dirname(os.path.realpath(__file__))
+    with open(f'{dir_path}/last_date.txt') as f:
+        date = f.read()
+    if last_date.strip() == date:
+        return True
+
+
+def update_last_date(date:str):
+    dir_path = os.path.dirname(os.path.realpath(__file__))
+    with open(f'{dir_path}/last_date.txt', 'w') as f:
+        f.write(date)
+
 
 
 if __name__ == '__main__':
@@ -55,10 +70,11 @@ if __name__ == '__main__':
     # display.start()
     web = webdriver.Chrome()
     date = get_post_info('https://georgerrmartin.com/notablog/', 'thedate', web)
-    if new_post_today(date):
+    if not same_post(date):
+        print('New post found!')
         content = get_post_info('https://georgerrmartin.com/notablog/', 'post', web)
         if find_winds_reference(content):
-            send_email(f'{ date} New potential Winds of winter Reference !','Check \n https://georgerrmartin.com/notablog/ \n Quick!!',
+            send_email(f'{ date} New potential Winds of winter Reference !',f'Check \n https://georgerrmartin.com/notablog/ \n Quick!! \n\n{content}',
                        SENDER,
                        recipients, password
                        )
@@ -67,6 +83,7 @@ if __name__ == '__main__':
                        SENDER,
                        recipients, password
                        )
+        update_last_date(date)
     else:
         send_email(f'{ date} No new blog post today',
                    'Keep watching on the wall',
