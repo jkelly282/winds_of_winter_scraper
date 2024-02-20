@@ -80,12 +80,14 @@ if __name__ == '__main__':
                        recipients, password
                        )
         else:
+            print('New post no winds though')
             send_email(f'{ todays_date} New blog post no winds though','Check \n https://georgerrmartin.com/notablog/ \n Words are wind',
                        SENDER,
                        recipients, password
                        )
         update_last_date(date)
     else:
+        print('No new blog post....')
         send_email(f'{ todays_date} No new blog post today',
                    'Keep watching on the wall',
                    SENDER,
