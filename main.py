@@ -66,26 +66,27 @@ def update_last_date(date:str):
 
 if __name__ == '__main__':
 
-    # display = Display(visible=0, size=(1600, 1200))
-    # display.start()
+    display = Display(visible=0, size=(1600, 1200))
+    display.start()
+    todays_date = datetime.datetime.today().strftime('%Y-%m-%d')
     web = webdriver.Chrome()
     date = get_post_info('https://georgerrmartin.com/notablog/', 'thedate', web)
     if not same_post(date):
         print('New post found!')
         content = get_post_info('https://georgerrmartin.com/notablog/', 'post', web)
         if find_winds_reference(content):
-            send_email(f'{ date} New potential Winds of winter Reference !',f'Check \n https://georgerrmartin.com/notablog/ \n Quick!! \n\n{content}',
+            send_email(f'{ todays_date} New potential Winds of winter Reference !',f'Check \n https://georgerrmartin.com/notablog/ \n Quick!! \n\n{content}',
                        SENDER,
                        recipients, password
                        )
         else:
-            send_email(f'{ date} New blog post no winds though','Check \n https://georgerrmartin.com/notablog/ \n Words are wind',
+            send_email(f'{ todays_date} New blog post no winds though','Check \n https://georgerrmartin.com/notablog/ \n Words are wind',
                        SENDER,
                        recipients, password
                        )
         update_last_date(date)
     else:
-        send_email(f'{ date} No new blog post today',
+        send_email(f'{ todays_date} No new blog post today',
                    'Keep watching on the wall',
                    SENDER,
                    recipients, password
